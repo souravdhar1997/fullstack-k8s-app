@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: notes-app
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: mongo
+
+  template:
+    metadata:
+      labels:
+        app: mongo
+
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:8
+
+        ports:
+        - containerPort: 27017
+
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+
+        volumeMounts:
+        - mountPath: /data/db
+          name: mongo-storage
+
+      volumes:
+      - name: mongo-storage
+        persistentVolumeClaim:
+          claimName: mongo-pvc
