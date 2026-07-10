@@ -16,13 +16,13 @@ jobs:
     steps:
       # Step 1: Checkout repository
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Step 2: Setup Node.js
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
 
       ####################################################
       # Backend
