@@ -51,3 +51,13 @@ jobs:
       - name: Build Frontend
         working-directory: frontend
         run: npm run build
+
+        ####################################################
+      # Docker Build
+      ####################################################
+
+      - name: Build Backend Docker Image
+        run: docker build -t savvydhar/backend:latest ./backend
+
+      - name: Build Frontend Docker Image
+        run: docker build -t savvydhar/frontend:latest ./frontend
