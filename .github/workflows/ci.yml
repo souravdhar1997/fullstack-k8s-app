@@ -15,8 +15,11 @@ jobs:
       - self-hosted
       - Windows
       - X64
-
+    
     steps:
+      - name: Mark workspace as safe for Git
+        run: git config --global --add safe.directory "${{ github.workspace }}"
+
       # Step 1: Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v6
