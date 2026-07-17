@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: savvydhar/frontend:v4
+        image: savvydhar/frontend:latest
 
         ports:
         - containerPort: 5173
