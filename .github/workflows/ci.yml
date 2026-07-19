@@ -60,7 +60,7 @@ jobs:
       ##############################################
 
       - name: Set Image Tag
-        shell: pwsh
+        shell: powershell
         run: |
           $sha = "${{ github.sha }}".Substring(0,7)
           "IMAGE_TAG=$sha" >> $env:GITHUB_ENV
