@@ -95,9 +95,9 @@ jobs:
       - name: Push Frontend Image
         run: docker push savvydhar/frontend:${{ env.IMAGE_TAG }}
 
-      ####################################################
+      #####################################################
       # Kubernetes Deployment
-      ####################################################
+      #####################################################
 
       - name: Verify kubectl
         run: |
