@@ -105,18 +105,6 @@ jobs:
           kubectl get nodes
           kubectl get deployments -n notes-app
 
-      - name: Update Backend Deployment
-        run: kubectl set image deployment/backend backend=savvydhar/backend:${{ env.IMAGE_TAG }} -n notes-app
-
-      - name: Update Frontend Deployment
-        run: kubectl set image deployment/frontend frontend=savvydhar/frontend:${{ env.IMAGE_TAG }} -n notes-app
-
-      - name: Wait for Backend Rollout
-        run: kubectl rollout status deployment/backend -n notes-app --timeout=180s
-      
-      - name: Wait for Frontend Rollout
-        run: kubectl rollout status deployment/frontend -n notes-app --timeout=180s
-
       
       ####################################################
       # Kubernetes Deployment
