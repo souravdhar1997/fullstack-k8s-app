@@ -1,0 +1,123 @@
+name: Manual Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+
+      revision:
+        description: "Rollback to Kubernetes Revision"
+        required: true
+        default: "1"
+
+      rollback_backend:
+        description: "Rollback Backend?"
+        required: true
+        type: boolean
+        default: true
+
+      rollback_frontend:
+        description: "Rollback Frontend?"
+        required: true
+        type: boolean
+        default: true
+
+jobs:
+
+  rollback:
+
+    runs-on:
+      - self-hosted
+      - Windows
+      - X64
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      ####################################################
+      # Show Current Rollout History
+      ####################################################
+
+      - name: Show Rollout History
+        shell: powershell
+        run: |
+
+          Write-Host "Backend History"
+
+          kubectl rollout history deployment/backend `
+            -n notes-app
+
+          Write-Host ""
+
+          Write-Host "Frontend History"
+
+          kubectl rollout history deployment/frontend `
+            -n notes-app
+
+      ####################################################
+      # Backend Rollback
+      ####################################################
+
+      - name: Rollback Backend
+        if: ${{ inputs.rollback_backend }}
+        shell: powershell
+        run: |
+
+          kubectl rollout undo deployment/backend `
+            --to-revision=${{ inputs.revision }} `
+            -n notes-app
+
+      ####################################################
+      # Frontend Rollback
+      ####################################################
+
+      - name: Rollback Frontend
+        if: ${{ inputs.rollback_frontend }}
+        shell: powershell
+        run: |
+
+          kubectl rollout undo deployment/frontend `
+            --to-revision=${{ inputs.revision }} `
+            -n notes-app
+
+      ####################################################
+      # Verify Rollback
+      ####################################################
+
+      - name: Wait for Backend Rollback
+        if: ${{ inputs.rollback_backend }}
+        run: kubectl rollout status deployment/backend -n notes-app
+
+      - name: Wait for Frontend Rollback
+        if: ${{ inputs.rollback_frontend }}
+        run: kubectl rollout status deployment/frontend -n notes-app
+
+      ####################################################
+      # Show Current Images
+      ####################################################
+
+      - name: Show Running Images
+        shell: powershell
+        run: |
+
+          Write-Host "Backend Image"
+
+          kubectl get deployment backend `
+            -n notes-app `
+            -o=jsonpath="{.spec.template.spec.containers[*].image}"
+
+          Write-Host ""
+
+          Write-Host "Frontend Image"
+
+          kubectl get deployment frontend `
+            -n notes-app `
+            -o=jsonpath="{.spec.template.spec.containers[*].image}"
+
+      ####################################################
+      # Show Pods
+      ####################################################
+
+      - name: Show Pods
+        run: kubectl get pods -n notes-app -o wide
