@@ -61,6 +61,21 @@ try {
         frontend=savvydhar/frontend:$ImageTag `
         -n $Namespace
 
+
+    ########################################################
+    # Annotate deployment
+    ########################################################
+    
+    kubectl annotate deployment/$BackendDeployment `
+    kubernetes.io/change-cause="Deploy Git SHA $ImageTag" `
+    --overwrite `
+    -n $Namespace
+
+    kubectl annotate deployment/$FrontendDeployment `
+    kubernetes.io/change-cause="Deploy Git SHA $ImageTag" `
+    --overwrite `
+    -n $Namespace
+
     ########################################################
     # Wait for Rollout
     ########################################################
