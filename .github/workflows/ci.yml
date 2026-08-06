@@ -95,23 +95,51 @@ jobs:
       - name: Push Frontend Image
         run: docker push savvydhar/frontend:${{ env.IMAGE_TAG }}
 
-      #####################################################
-      # Kubernetes Deployment
-      #####################################################
+    ####################################################
+    # Kubernetes Deployment using Helm
+    ####################################################
 
-      - name: Verify kubectl
+      - name: Verify Kubernetes
+        shell: powershell
         run: |
           kubectl version --client
           kubectl get nodes
-          kubectl get deployments -n notes-app
+          helm version
 
-      
-      ####################################################
-      # Kubernetes Deployment
-      ####################################################
-
-      - name: Deploy to Kubernetes
+      - name: Deploy using Helm
         shell: powershell
         run: |
-          .\scripts\deploy.ps1 `
-            -ImageTag "${{ env.IMAGE_TAG }}"
+          helm upgrade --install notes-app ./helm/notes-app `
+          --namespace notes-app `
+          --create-namespace `
+          --set backend.image.tag="${{ env.IMAGE_TAG }}" `
+          --set frontend.image.tag="${{ env.IMAGE_TAG }}"
+
+    ####################################################
+    # Verify Rollout
+    ####################################################
+
+      - name: Verify Backend Rollout
+        run: kubectl rollout status deployment/backend -n notes-app --timeout=180s
+
+      - name: Verify Frontend Rollout
+        run: kubectl rollout status deployment/frontend -n notes-app --timeout=180s
+
+    ####################################################
+    # Show Helm Status
+    ####################################################
+
+      - name: Helm Status
+        run: helm status notes-app -n notes-app
+
+    ####################################################
+    # Show Running Pods
+    ####################################################
+
+      - name: Show Running Pods
+        run: kubectl get pods -n notes-app -o wide
+
+      - name: Show Running Images
+        shell: powershell
+        run: |
+          kubectl get pods -n notes-app -o=jsonpath="{range .items[*]}{.metadata.name}{': '}{range .spec.containers[*]}{.image}{' '}{end}{'\n'}{end}"

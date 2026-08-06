@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: {{ .Values.namespace }}
+
+spec:
+  replicas: {{ .Values.mongo.replicaCount }}
+
+  selector:
+    matchLabels:
+      app: mongo
+
+  template:
+    metadata:
+      labels:
+        app: mongo
+
+    spec:
+      containers:
+      - name: mongo
+        image: "{{ .Values.mongo.image.repository }}:{{ .Values.mongo.image.tag }}"
+
+        ports:
+        - containerPort: {{ .Values.mongo.containerPort }}
+
+        resources:
+          requests:
+            cpu: {{ .Values.resources.mongo.requests.cpu }}
+            memory: {{ .Values.resources.mongo.requests.memory }}
+          limits:
+            cpu: {{ .Values.resources.mongo.limits.cpu }}
+            memory: {{ .Values.resources.mongo.limits.memory }}
+
+        volumeMounts:
+        - mountPath: {{ .Values.mongo.persistence.mountPath }}
+          name: mongo-storage
+
+      volumes:
+      - name: mongo-storage
+        persistentVolumeClaim:
+          claimName: {{ .Values.mongo.persistence.claimName }}

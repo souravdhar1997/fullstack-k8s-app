@@ -1,0 +1,136 @@
+namespace: notes-app
+
+####################################################
+# Backend
+####################################################
+
+backend:
+  replicaCount: 2
+
+  image:
+    repository: savvydhar/backend
+    tag: ""
+
+  service:
+    type: ClusterIP
+    port: 5000
+
+  containerPort: 5000
+
+  config:
+    port: "5000"
+    mongoUri: "mongodb://mongo-service:27017/notesdb"
+
+
+####################################################
+# Frontend
+####################################################
+
+frontend:
+  replicaCount: 2
+
+  image:
+    repository: savvydhar/frontend
+    tag: ""
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  containerPort: 80
+
+
+####################################################
+# MongoDB
+####################################################
+
+mongo:
+  replicaCount: 1
+
+  image:
+    repository: mongo
+    tag: "8"
+
+  service:
+    type: ClusterIP
+    port: 27017
+
+  containerPort: 27017
+
+  persistence:
+    claimName: mongo-pvc
+    mountPath: /data/db
+
+
+####################################################
+# Persistent Volume
+####################################################
+
+persistence:
+  enabled: true
+  storage: 1Gi
+
+####################################################
+# Ingress
+####################################################
+
+ingress:
+  enabled: true
+
+  className: nginx
+
+  host: notes.local
+
+  frontend:
+    serviceName: frontend-service
+    servicePort: 80
+
+  backend:
+    serviceName: backend-service
+    servicePort: 5000
+
+####################################################
+# Resources
+####################################################
+
+resources:
+  backend:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  frontend:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+
+    limits:
+      cpu: "300m"
+      memory: "256Mi"
+
+  mongo:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+
+
+####################################################
+# Health Probes
+####################################################
+
+probes:
+  backend:
+    readiness:
+      path: /health/ready
+
+    liveness:
+      path: /health/live
