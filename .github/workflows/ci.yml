@@ -112,7 +112,7 @@ jobs:
           helm upgrade --install notes-app ./helm/notes-app `
           --namespace notes-app `
           --create-namespace `
-          --set backend.image.tag="${{ env.IMAGE_TAG }}" `
+          --set backend.image.tag="abcdef123" `
           --set frontend.image.tag="${{ env.IMAGE_TAG }}"
 
     ####################################################
@@ -125,11 +125,44 @@ jobs:
       - name: Verify Frontend Rollout
         run: kubectl rollout status deployment/frontend -n notes-app --timeout=180s
 
+
+    ####################################################
+    # Automatic Rollback
+    ####################################################
+
+      - name: Rollback on Failure
+        if: failure()
+        shell: powershell
+        run: |
+          Write-Host "Deployment failed. Rolling back Helm release..."
+
+          $currentRevision = helm history notes-app -n notes-app `
+          --output json | ConvertFrom-Json
+
+          $previousRevision = ($currentRevision | Sort-Object revision)[-2].revision
+
+          helm rollback notes-app $previousRevision -n notes-app
+
+          kubectl rollout status deployment/backend -n notes-app --timeout=180s
+          kubectl rollout status deployment/frontend -n notes-app --timeout=180s
+
+          Write-Host "Rollback completed successfully."
+
+
+    ####################################################
+    # Helm History
+    ####################################################
+
+      - name: Helm History
+        if: always()
+        run: helm history notes-app -n notes-app
+
     ####################################################
     # Show Helm Status
     ####################################################
 
       - name: Helm Status
+        if: always()
         run: helm status notes-app -n notes-app
 
     ####################################################
