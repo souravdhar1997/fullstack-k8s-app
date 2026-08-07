@@ -112,7 +112,7 @@ jobs:
           helm upgrade --install notes-app ./helm/notes-app `
           --namespace notes-app `
           --create-namespace `
-          --set backend.image.tag="abcdef123" `
+          --set backend.image.tag="${{ env.IMAGE_TAG }}" `
           --set frontend.image.tag="${{ env.IMAGE_TAG }}"
 
     ####################################################
