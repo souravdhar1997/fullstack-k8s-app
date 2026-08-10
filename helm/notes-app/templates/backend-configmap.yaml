@@ -5,4 +5,3 @@ metadata:
   namespace: {{ .Values.namespace }}
 data:
   PORT: "{{ .Values.backend.config.port }}"
-  MONGO_URI: "{{ .Values.backend.config.mongoUri }}"

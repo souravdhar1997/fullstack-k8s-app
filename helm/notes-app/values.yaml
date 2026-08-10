@@ -19,6 +19,8 @@ backend:
 
   config:
     port: "5000"
+
+  secret:
     mongoUri: "mongodb://mongo-service:27017/notesdb"
 
 
