@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.namespace }}
 
 spec:
-  replicas: {{ .Values.backend.replicaCount }}
+  # replicas: {{ .Values.backend.replicaCount }}
 
   selector:
     matchLabels:
