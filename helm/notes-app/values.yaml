@@ -43,18 +43,11 @@ frontend:
 
 
 ####################################################
-# HPA
+# HPA for Backend only
 ####################################################
 
 autoscaling:
   backend:
-    enabled: true
-    minReplicas: 2
-    maxReplicas: 5
-    targetCPUUtilizationPercentage: 70
-
-
-  frontend:
     enabled: true
     minReplicas: 2
     maxReplicas: 5
