@@ -25,17 +25,6 @@ backend:
 
 
 ####################################################
-# HPA for Backend
-####################################################
-
-autoscaling:
-  backend:
-    enabled: true
-    minReplicas: 2
-    maxReplicas: 5
-    targetCPUUtilizationPercentage: 70
-
-####################################################
 # Frontend
 ####################################################
 
@@ -51,6 +40,25 @@ frontend:
     port: 80
 
   containerPort: 80
+
+
+####################################################
+# HPA
+####################################################
+
+autoscaling:
+  backend:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+
+  frontend:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
 
 
 ####################################################
