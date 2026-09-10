@@ -1,0 +1,77 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: notes-app-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: notes-app.rules
+      rules:
+
+        - alert: BackendPodDown
+          expr: |
+            kube_deployment_status_replicas_available{
+              namespace="notes-app",
+              deployment="backend"
+            } < 1
+          for: 2m
+          labels:
+            severity: critical
+            app: notes-app
+          annotations:
+            summary: "Backend is unavailable"
+            description: "The notes-app backend has no available replicas for more than 2 minutes."
+
+        - alert: FrontendPodDown
+          expr: |
+            kube_deployment_status_replicas_available{
+              namespace="notes-app",
+              deployment="frontend"
+            } < 1
+          for: 2m
+          labels:
+            severity: critical
+            app: notes-app
+          annotations:
+            summary: "Frontend is unavailable"
+            description: "The notes-app frontend has no available replicas for more than 2 minutes."
+
+        - alert: MongoDBDown
+          expr: |
+            kube_deployment_status_replicas_available{
+              namespace="notes-app",
+              deployment="mongo"
+            } < 1
+          for: 2m
+          labels:
+            severity: critical
+            app: notes-app
+          annotations:
+            summary: "MongoDB is unavailable"
+            description: "The notes-app MongoDB deployment has no available replicas for more than 2 minutes."
+
+        - alert: BackendHighCPU
+          expr: |
+            (
+              sum(rate(container_cpu_usage_seconds_total{
+                namespace="notes-app",
+                pod=~"backend-.*",
+                container="backend"
+              }[5m]))
+              /
+              sum(kube_pod_container_resource_requests{
+                namespace="notes-app",
+                pod=~"backend-.*",
+                container="backend",
+                resource="cpu"
+              })
+            ) > 0.80
+          for: 5m
+          labels:
+            severity: warning
+            app: notes-app
+          annotations:
+            summary: "Backend CPU usage is high"
+            description: "Backend CPU usage has exceeded 80% of its requested CPU for 5 minutes."

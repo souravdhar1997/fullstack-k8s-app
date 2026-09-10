@@ -27,3 +27,6 @@ coverage/
 
 # Misc
 *.swp
+
+# alertmanager secret config
+monitoring/alertmanager-config.yaml
